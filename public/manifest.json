@@ -1,0 +1,35 @@
+{
+  "version": "0.1.0",
+  "name": "Sketch Grid",
+  "short_name": "Sketch Grid",
+  "manifest_version": 2,
+  "description": "An extension for a grid overlay with configurable settings similar to Sketch Grid",
+  "homepage_url": "https://github.com/mschimk1/sketch-grid-extension",
+  "icons": {
+    "16": "images/16x16.png",
+    "48": "images/48x48.png",
+    "128": "images/128x128.png"
+  },
+  "browser_action": {
+    "default_icon": "images/38x38.png",
+    "default_title": "Sketch Grid",
+    "default_popup": "index.html#popup"
+  },
+  "background": {
+    "scripts": ["static/js/background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["/static/js/main.js"],
+      "css": ["/static/css/main.css"]
+    }
+  ],
+  "options_ui": {
+    "page": "index.html#options",
+    "open_in_tab": true
+  },
+  "permissions": ["contextMenus", "tabs", "activeTab", "storage", "http://*/*", "https://*/*", "file://*/*"],
+  "content_security_policy": "script-src 'self'; object-src 'self'; style-src * 'unsafe-inline'; img-src 'self' data:;"
+}
