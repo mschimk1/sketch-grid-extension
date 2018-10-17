@@ -2,9 +2,7 @@
 
 Sketch Grid is a Chrome extension for front-end developers. It adds a customisable baseline grid and layout settings similar to Sketch to your web page.
 
-![Sketch Grid and Layout Settings](docs/images/8pt-grid-template_sketch.png)
-
-![Extension Grid Settings](docs/images/8pt-grid-template_sketch.png)
+![Sketch Grid and Layout Settings](docs/images/8pt-grid-template_sketch.png 'Sketch Grid Settings')
 
 This project is fairly new, but does the following already:
 
@@ -20,6 +18,7 @@ This project is fairly new, but does the following already:
 Install via Git
 
 - Clone the git repository to your local machine.
+- Run `yarn install` and `yarn run build`
 - Open Chrome and navigate to [Extensions](chrome://extensions/).
 - Be sure the "Developer mode" switch is on and then click "Load unpacked" button.
 - Navigate to the folder on your machine and press Select.
@@ -49,10 +48,10 @@ Builds the app for bundling to the `build` folder.<br>
 
 ## Ideas & Tasks
 
-- [] Add Sketch layout settings
-- [] Styling of extension views
-- [] Add keyboard shortcuts
-- [] Help content tab
+- [ ] Add Sketch layout settings
+- [ ] Styling of extension views
+- [ ] Add keyboard shortcuts
+- [ ] Help content tab
 
 ## Credits & Inspiration
 
