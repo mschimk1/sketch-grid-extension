@@ -43,3 +43,39 @@ test('dispatches setOptions action if options form values change', () => {
   const expectedAction = { type: SET_OPTIONS, payload: { blockSize: '12' } };
   expect(store.getActions()).toEqual([expectedAction]);
 });
+
+test('Toggles help section when click the help icon button', () => {
+  const popupContainer = mount(<Popup store={store} />);
+  expect(
+    popupContainer
+      .find('Collapse')
+      .at(0)
+      .prop('in')
+  ).toBe(false);
+  const helpButton = popupContainer.find('HelpOutlineIcon');
+  helpButton.simulate('click');
+  expect(
+    popupContainer
+      .find('Collapse')
+      .at(0)
+      .prop('in')
+  ).toBe(true);
+});
+
+test('Toggles options section when click the settings icon', () => {
+  const popupContainer = mount(<Popup store={store} />);
+  expect(
+    popupContainer
+      .find('Collapse')
+      .at(1)
+      .prop('in')
+  ).toBe(false);
+  const settingsButton = popupContainer.find('SettingsIcon');
+  settingsButton.simulate('click');
+  expect(
+    popupContainer
+      .find('Collapse')
+      .at(1)
+      .prop('in')
+  ).toBe(true);
+});

@@ -96,8 +96,8 @@ const enhance = compose(
   withState('showHelp', 'toggleHelp', false),
   withState('showOptions', 'toggleOptions', false),
   withHandlers({
-    toggleHelp: ({ toggleHelp, toggleOptions }) => e => !toggleHelp(current => !current) && toggleOptions(false),
-    toggleOptions: ({ toggleOptions, toggleHelp }) => e => !toggleOptions(current => !current) && toggleHelp(false),
+    toggleHelp: ({ toggleHelp, toggleOptions }) => () => !toggleHelp(current => !current) && toggleOptions(false),
+    toggleOptions: ({ toggleOptions, toggleHelp }) => () => !toggleOptions(current => !current) && toggleHelp(false),
     handleOptionsChange: ({ actions: { setOptions }, gridOptions }) => e => {
       setOptions({ ...gridOptions, ...{ [e.target.name]: e.target.value } });
     }
