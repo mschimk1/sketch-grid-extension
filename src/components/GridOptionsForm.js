@@ -21,13 +21,13 @@ const styles = theme => ({
     display: 'flex',
     width: theme.spacing.unit * 40,
     flexGrow: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#fff'
   },
   container: {
     display: 'flex',
     flexWrap: 'wrap',
-    marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit
+    marginTop: theme.spacing.unit * 2,
+    marginBottom: theme.spacing.unit * 2
   },
   pickerButtons: {
     marginLeft: theme.spacing.unit * 2

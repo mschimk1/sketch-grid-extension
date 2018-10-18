@@ -52,8 +52,8 @@ const Popup = ({
   toggleOptions,
   handleOptionsChange
 }) => (
-  <AppBar data-testid="popup" className={classes.root} position="static" color="inherit">
-    <Toolbar className={classes.toolbar}>
+  <AppBar data-testid="popup" className={classes.root} position="static" color="default">
+    <Toolbar className={classes.toolbar} variant="dense">
       <Typography variant="title" color="inherit" className={classes.grow}>
         Sketch Grid
       </Typography>

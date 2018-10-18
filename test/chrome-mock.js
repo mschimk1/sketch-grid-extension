@@ -1,4 +1,4 @@
-const store = {};
+let store = {};
 
 function resolveKey(key) {
   if (typeof key === 'string') {
@@ -47,6 +47,7 @@ const chrome = {
         return Promise.resolve();
       }),
       clear: jest.fn(cb => {
+        store = {};
         if (cb !== undefined) {
           return cb();
         }

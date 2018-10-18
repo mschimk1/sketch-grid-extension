@@ -8,23 +8,24 @@ import storage from './utils/storage';
 
 export default class GridController {
   constructor(store) {
-    this._store = store || this.initStore();
-  }
-  async initStore() {
-    const defaultSettings = (await storage.get(EXTENSION_ID)) || initStorage;
-    const initialState = createInitialState(defaultSettings);
-    const store = configureStore(initialState);
     this._store = store;
   }
   init() {
     chrome.runtime.onMessage.addListener((req, _, sendResponse) => {
-      if (req.action === 'updateState') this.updateState(req.state);
-      if (req.action === 'getState') this.sendState(sendResponse);
+      if (req.action === 'updateState') this.initStore().then(this.updateState(req.state));
+      if (req.action === 'getState') this.initStore().then(this.sendState(sendResponse));
     });
-    chrome.runtime.onInstalled.addListener(async () => {
-      await storage.clear();
-      await storage.set(EXTENSION_ID, initStorage);
+    chrome.runtime.onInstalled.addListener(() => {
+      storage.clear();
+      storage.set(EXTENSION_ID, initStorage);
     });
+  }
+  async initStore() {
+    if (!this._store) {
+      const storedSettings = await storage.get(EXTENSION_ID);
+      const initialState = createInitialState(storedSettings || initStorage);
+      this._store = configureStore(initialState);
+    }
   }
   updateState(state) {
     this._store.dispatch({

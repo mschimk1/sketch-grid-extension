@@ -12,8 +12,8 @@ Sketch Grid is a Chrome extension for front-end developers. It adds a customisab
 
 This project is fairly new, but does the following already:
 
-- [x] Switch toggles the baseline grid on and off
-- [x] Configurable baseline grid options (options are currently stored globally)
+- [x] Switch turns the grid overlay on and off
+- [x] Configurable grid options (options are currently stored globally)
 - [x] Synchronizes extension popup, options and content pages
 - [x] Default settings based on 8pt grid for the core structure of your page grid
 
@@ -57,7 +57,9 @@ Builds the app for bundling to the `build` folder.<br>
 - [ ] Add Sketch layout settings
 - [ ] Styling of extension views
 - [ ] Add keyboard shortcuts
+- [ ] Add Sketch Guides
 - [ ] Help content tab
+- [ ] E2E tests of extension views
 
 ## Credits & Inspiration
 

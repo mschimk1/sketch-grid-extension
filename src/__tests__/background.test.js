@@ -5,6 +5,10 @@ import GridController from '../background';
 const middlewares = [];
 const mockStore = configureStore(middlewares);
 
+beforeEach(() => {
+  chrome.storage.local.clear();
+});
+
 test('init calls message listener', () => {
   const store = mockStore({});
   const controller = new GridController(store);
@@ -69,4 +73,14 @@ test('install listener resets storage to default values', async () => {
   await controller.init();
   expect(chrome.storage.local.clear).toHaveBeenCalled();
   expect(chrome.storage.local.set).toHaveBeenCalled();
+});
+
+test('controller initialles the store async before calling message listener function', () => {
+  chrome.runtime.onMessage.addListener.mockImplementationOnce(async cb => {
+    await cb({ action: 'getState' }, {}, jest.fn());
+  });
+  const controller = new GridController();
+  const spy = jest.spyOn(controller, 'initStore');
+  controller.init();
+  expect(spy).toHaveBeenCalled();
 });

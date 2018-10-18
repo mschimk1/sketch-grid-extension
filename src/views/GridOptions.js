@@ -32,7 +32,7 @@ const styles = theme => ({
 });
 
 const GridOptions = ({ classes, gridOptions, handleOptionsChange, handleRestoreDefaults }) => (
-  <AppBar data-testid="options" className={classes.root} position="static" color="inherit">
+  <AppBar data-testid="options" className={classes.root} position="static" color="default">
     <Toolbar className={classes.toolbar}>
       <Typography variant="title" color="inherit" className={classes.grow}>
         Sketch Grid Options
@@ -78,7 +78,7 @@ const enhance = compose(
     handleOptionsChange: ({ actions: { setOptions }, gridOptions }) => e => {
       setOptions({ ...gridOptions, ...{ [e.target.name]: e.target.value } });
     },
-    handleRestoreDefaults: ({ actions: { updateState } }) => e => {
+    handleRestoreDefaults: ({ actions: { updateState } }) => () => {
       const { options } = initStorage;
       updateState({ options });
     }
