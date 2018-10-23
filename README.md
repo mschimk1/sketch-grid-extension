@@ -1,6 +1,9 @@
 # Sketch Grid Chrome Extension
 
-Sketch Grid is a Chrome extension for front-end developers. It adds a customisable baseline grid and layout settings similar to Sketch to your web page.
+[![Build Status](https://travis-ci.org/mschimk1/sketch-grid-extension.svg?branch=master)](https://travis-ci.org/mschimk1/sketch-grid-extension)
+[![Coverage Status](https://coveralls.io/repos/github/mschimk1/sketch-grid-extension/badge.svg)](https://coveralls.io/github/mschimk1/sketch-grid-extension)
+
+> Sketch Grid is a Chrome extension for front-end developers. It adds a customisable baseline grid and layout settings similar to Sketch to your web page.
 
 #### Sketch Grid Settings
 
