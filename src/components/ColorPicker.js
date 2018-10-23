@@ -79,7 +79,7 @@ const StyledWithThemeProps = props =>
       },
       popover: {
         position: 'fixed',
-        top: '52px',
+        top: '96px',
         zIndex: '2'
       },
       cover: {

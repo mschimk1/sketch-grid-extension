@@ -1,12 +1,12 @@
 {
   "name": "sketch-grid-extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Chrome extension for a grid overlay with configurable settings similar to Sketch Grid",
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls"
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "author": "Michael Schimko",
   "license": "Unlicense",
@@ -55,6 +55,7 @@
     "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
+    "lodash": "^4.17.11",
     "mini-css-extract-plugin": "0.4.3",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",

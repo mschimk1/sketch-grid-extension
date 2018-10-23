@@ -1,40 +1,26 @@
 /*global chrome*/
 import { EXTENSION_ID } from './constants';
-import { UPDATE_STATE } from './store/actions';
-import configureStore from './store/configureStore';
-import initStorage from './utils/initStorage';
-import createInitialState from './utils/createInitialState';
-import storage from './utils/storage';
 
 export default class GridController {
-  constructor(store) {
-    this._store = store;
-  }
   init() {
-    chrome.runtime.onMessage.addListener((req, _, sendResponse) => {
-      if (req.action === 'updateState') this.initStore().then(this.updateState(req.state));
-      if (req.action === 'getState') this.initStore().then(this.sendState(sendResponse));
-    });
+    // reset options after installation
     chrome.runtime.onInstalled.addListener(() => {
-      storage.clear();
-      storage.set(EXTENSION_ID, initStorage);
+      this.resetStorage();
+    });
+    //Clear tab storage when it is closed
+    chrome.tabs.onRemoved.addListener(tabId => {
+      chrome.storage.local.remove(tabId.toString());
     });
   }
-  async initStore() {
-    if (!this._store) {
-      const storedSettings = await storage.get(EXTENSION_ID);
-      const initialState = createInitialState(storedSettings || initStorage);
-      this._store = configureStore(initialState);
-    }
-  }
-  updateState(state) {
-    this._store.dispatch({
-      type: UPDATE_STATE,
-      payload: state
+  resetStorage() {
+    chrome.storage.local.get(data => {
+      const defaultSettings = data[EXTENSION_ID];
+      chrome.storage.local.clear(() => {
+        if (defaultSettings) {
+          chrome.storage.local.set({ EXTENSION_ID: defaultSettings });
+        }
+      });
     });
-  }
-  sendState(sendResponse) {
-    sendResponse(this._store.getState());
   }
 }
 

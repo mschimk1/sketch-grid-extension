@@ -37,7 +37,7 @@ const styles = theme => ({
   helpContainer: {
     paddingLeft: theme.spacing.unit * 2,
     paddingRight: theme.spacing.unit * 2,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#fff'
   }
 });
 
@@ -57,7 +57,7 @@ const Popup = ({
       <Typography variant="title" color="inherit" className={classes.grow}>
         Sketch Grid
       </Typography>
-      <Switch checked={gridVisible} onChange={() => actions.toggleGrid(gridVisible)} value="showGrid" color="primary" />
+      <Switch checked={gridVisible} onChange={() => actions.toggleGrid(gridVisible)} value="showGrid" />
       <IconButton className={classes.actionButton} color="inherit" aria-label="Help">
         <HelpIcon onClick={toggleHelp} />
       </IconButton>

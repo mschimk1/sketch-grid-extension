@@ -61,6 +61,10 @@ Builds the app for bundling to the `build` folder.<br>
 - [ ] Help content tab
 - [ ] E2E tests of extension views
 
+## Known Issues
+
+- Grid overlay will not appear if the local storage of a tab is exhausted.
+
 ## Credits & Inspiration
 
 - This extension is based on [React Sketch Grid](https://blog.prototypr.io/using-sketchs-grid-in-react-35e67cf7e2d2) grid by Alonso Holmes. Thanks Alonso!

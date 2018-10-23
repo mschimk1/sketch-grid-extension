@@ -32,7 +32,7 @@ const StyledSketchGridWithProps = props =>
         margin: 0
       },
       container: {
-        maxWidth: props.maxWidth,
+        maxWidth: `${props.maxWidth}px`,
         height: '100%',
         pointerEvents: 'none',
         boxSizing: 'border-box',

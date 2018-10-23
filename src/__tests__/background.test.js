@@ -1,86 +1,52 @@
 /* global chrome */
-import configureStore from 'redux-mock-store';
+import { EXTENSION_ID } from '../constants';
 import GridController from '../background';
-
-const middlewares = [];
-const mockStore = configureStore(middlewares);
 
 beforeEach(() => {
   chrome.storage.local.clear();
 });
 
-test('init calls message listener', () => {
-  const store = mockStore({});
-  const controller = new GridController(store);
-  controller.init();
-  expect(chrome.runtime.onMessage.addListener).toHaveBeenCalled();
-});
-
-test('update state message listener', () => {
-  chrome.runtime.onMessage.addListener.mockImplementationOnce(cb => {
-    cb({ action: 'updateState', state: { test: 'data' } });
-  });
-  const store = mockStore({});
-  const controller = new GridController(store);
-  const spy = jest.spyOn(controller, 'updateState');
-  controller.init();
-  expect(spy).toHaveBeenCalledWith({ test: 'data' });
-});
-
-test('get state message listener', () => {
-  chrome.runtime.onMessage.addListener.mockImplementationOnce(cb => {
-    cb({ action: 'getState' }, {}, jest.fn());
-  });
-  const store = mockStore({});
-  const controller = new GridController(store);
-  const spy = jest.spyOn(controller, 'sendState');
-  controller.init();
-  expect(spy).toHaveBeenCalled();
-});
-
-test('update state dispatches action', () => {
-  const initialState = {};
-  const store = mockStore(initialState);
-  const controller = new GridController(store);
-  controller.updateState({});
-  const actions = store.getActions();
-  const expectedPayload = { type: 'UPDATE_STATE', payload: initialState };
-  expect(actions).toEqual([expectedPayload]);
-});
-
-test('send state sends the current state as the response message', () => {
-  const sendResponseMock = jest.fn();
-  const initialState = { test: 'data' };
-  const store = mockStore(initialState);
-  const controller = new GridController(store);
-  controller.sendState(sendResponseMock);
-  expect(sendResponseMock).toHaveBeenCalledWith(initialState);
+afterEach(() => {
+  jest.clearAllMocks();
 });
 
 test('init calls install listener', () => {
-  const store = mockStore({});
-  const controller = new GridController(store);
+  const controller = new GridController();
   controller.init();
   expect(chrome.runtime.onInstalled.addListener).toHaveBeenCalled();
 });
 
-test('install listener resets storage to default values', async () => {
+test('install listener resets storage to default settings if found', () => {
   chrome.runtime.onInstalled.addListener.mockImplementationOnce(cb => {
-    cb(Promise.resolve());
+    cb();
   });
-  const store = mockStore({});
-  const controller = new GridController(store);
-  await controller.init();
+  chrome.storage.local.get.mockImplementationOnce(cb => {
+    cb({ test: 'data', [EXTENSION_ID]: {} });
+  });
+  const controller = new GridController();
+  controller.init();
   expect(chrome.storage.local.clear).toHaveBeenCalled();
   expect(chrome.storage.local.set).toHaveBeenCalled();
 });
 
-test('controller initialles the store async before calling message listener function', () => {
-  chrome.runtime.onMessage.addListener.mockImplementationOnce(async cb => {
-    await cb({ action: 'getState' }, {}, jest.fn());
+test('install listener does not resets storage to default values if not found', () => {
+  chrome.runtime.onInstalled.addListener.mockImplementationOnce(cb => {
+    cb();
+  });
+  chrome.storage.local.get.mockImplementationOnce(cb => {
+    cb({ test: 'data' });
   });
   const controller = new GridController();
-  const spy = jest.spyOn(controller, 'initStore');
   controller.init();
-  expect(spy).toHaveBeenCalled();
+  expect(chrome.storage.local.clear).toHaveBeenCalled();
+  expect(chrome.storage.local.set).not.toHaveBeenCalled();
+});
+
+test('removes local storage if tab is closed', () => {
+  chrome.tabs.onRemoved.addListener.mockImplementationOnce(cb => {
+    cb('1234');
+  });
+  const controller = new GridController();
+  controller.init();
+  expect(chrome.storage.local.remove).toHaveBeenCalledWith('1234');
 });

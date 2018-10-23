@@ -7,7 +7,11 @@ import { SET_OPTIONS } from '../../store/actions';
 import { LOCAL_STORAGE_KEY } from '../../constants';
 
 const mockStore = configureStore([]);
-let store = mockStore({});
+const defaultOptions = {
+  [LOCAL_STORAGE_KEY]: false,
+  options: { blockSize: 8, thickLinesEvery: 6, lightColor: '', darkColor: '' }
+};
+let store = mockStore(defaultOptions);
 
 test('renders the popup', () => {
   const popupContainer = mount(<Popup store={store} />);
@@ -15,17 +19,16 @@ test('renders the popup', () => {
 });
 
 test('Switch toggles grid visibility', () => {
-  store = mockStore({ [LOCAL_STORAGE_KEY]: false });
   let popupContainer = mount(<Popup store={store} />);
   let input = popupContainer.find('input').at(0);
   input.simulate('change', { target: { checked: true } });
-  const expectedEnableAction = { type: 'UPDATE_STATE', payload: { 'Grid.Visible': true } };
+  const expectedEnableAction = { type: '@@sketch-grid-extension/UPDATE_STATE', payload: { 'Grid.Visible': true } };
   expect(store.getActions()).toEqual([expectedEnableAction]);
 
-  store = mockStore({ [LOCAL_STORAGE_KEY]: true });
+  store = mockStore({ ...defaultOptions, [LOCAL_STORAGE_KEY]: true });
   popupContainer = mount(<Popup store={store} />);
   input = popupContainer.find('input').at(0);
-  const expectedDisableAction = { type: 'UPDATE_STATE', payload: { 'Grid.Visible': false } };
+  const expectedDisableAction = { type: '@@sketch-grid-extension/UPDATE_STATE', payload: { 'Grid.Visible': false } };
   input.simulate('change', { target: { checked: false } });
   expect(store.getActions()).toEqual([expectedDisableAction]);
 });

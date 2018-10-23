@@ -5,7 +5,7 @@ import configureStore from 'redux-mock-store';
 import App from '../App';
 
 const mockStore = configureStore([]);
-const store = mockStore({});
+const store = mockStore({ options: { blockSize: 8, thickLinesEvery: 6, lightColor: '', darkColor: '' } });
 
 afterEach(cleanup);
 

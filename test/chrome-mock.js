@@ -6,13 +6,14 @@ function resolveKey(key) {
     result[key] = store[key];
     return result;
   }
-  throw new Error('Wrong key given');
+  return store;
 }
 
 const chrome = {
   tabs: {
     executeScript: jest.fn(),
     onUpdated: { addListener: jest.fn() },
+    onRemoved: { addListener: jest.fn() },
     query: jest.fn((_, cb) => cb([{ id: 1 }])),
     sendMessage: jest.fn()
   },
@@ -52,8 +53,10 @@ const chrome = {
           return cb();
         }
         return Promise.resolve();
-      })
-    }
+      }),
+      remove: jest.fn()
+    },
+    onChanged: { addListener: jest.fn() }
   }
 };
 

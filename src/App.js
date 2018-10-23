@@ -4,7 +4,7 @@ import compose from 'recompose/compose';
 import setPropTypes from 'recompose/setPropTypes';
 import renderComponent from 'recompose/renderComponent';
 import SketchGrid from './views/SketchGrid';
-import GridOptions from './views/GridOptions';
+import Options from './views/Options';
 import Popup from './views/Popup';
 import { isPopupView, isOptionsView } from './utils/browser';
 import withTheme from './withTheme';
@@ -15,7 +15,7 @@ const enhance = compose(
   setPropTypes({
     view: PropTypes.string.isRequired
   }),
-  conditionalRender([{ view: isPopupView, render: Popup }, { view: isOptionsView, render: GridOptions }])
+  conditionalRender([{ view: isPopupView, render: Popup }, { view: isOptionsView, render: Options }])
 );
 
 const App = enhance(SketchGrid);

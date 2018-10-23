@@ -80,8 +80,13 @@ test('isContentView returns true if view is blank', () => {
   expect(isContentView({ view })).toBe(true);
 });
 
-test('isContentView returns false if view is not blank', () => {
+test('isContentView returns true if view is not blank', () => {
   const view = 'other';
+  expect(isContentView({ view })).toBe(true);
+});
+
+test('isContentView returns false if view is popup', () => {
+  const view = 'popup';
   expect(isContentView({ view })).toBe(false);
 });
 
