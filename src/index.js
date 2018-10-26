@@ -8,15 +8,15 @@ import {
   getOrCreateExtensionElement,
   removeExtensionElement,
   getView,
-  isPopupView,
-  isOptionsView
+  isOptionsView,
+  isPopupView
 } from './utils/browser';
 import configureStore from './store/configureStore';
 import { isGridVisible } from './store/selectors';
 import initStorage from './utils/initStorage';
 import App from './App';
 
-const renderView = store => view => {
+const renderView = view => store => {
   const mounTo = getOrCreateExtensionElement(document);
   ReactDOM.render(
     <Provider store={store}>
@@ -27,20 +27,39 @@ const renderView = store => view => {
 };
 
 export const bootstrap = (view = '') => {
-  configureStore(initStorage, store => {
-    const renderViewWithStore = renderView(store);
-    if (isPopupView({ view }) || isOptionsView({ view })) {
-      renderViewWithStore(view);
-    } else {
-      const gridVisible = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
-      store.subscribe(() => {
-        // Set Grid component visibility
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(isGridVisible(store.getState())));
-        isGridVisible(store.getState()) ? renderViewWithStore(view) : removeExtensionElement(document);
+  if (isPopupView({ view }) || isOptionsView({ view })) {
+    chrome.tabs.query({ currentWindow: true, active: true }, tabs => {
+      const tabId = tabs[0].id;
+      configureStore(initStorage, {
+        tabId: tabId.toString(),
+        onInit: store => {
+          chrome.tabs.sendMessage(tabId, { action: 'initTab', tabId });
+          renderView(view)(store);
+        }
       });
-      isGridVisible({ [LOCAL_STORAGE_KEY]: gridVisible }) && renderViewWithStore(view);
-    }
-  });
+    });
+  } else {
+    new Promise((resolve, reject) => {
+      chrome.runtime.onMessage.addListener(msg => {
+        if (msg.action === 'initTab') {
+          resolve(msg.tabId.toString());
+        }
+      });
+    }).then(tabId => {
+      configureStore(initStorage, {
+        tabId,
+        onInit: store => {
+          isGridVisible(store.getState()) && renderView(view)(store);
+          store.subscribe(() => {
+            const gridVisible = isGridVisible(store.getState());
+            // Set Grid component visibility
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gridVisible));
+            gridVisible ? renderView(view)(store) : removeExtensionElement(document);
+          });
+        }
+      });
+    });
+  }
 };
 
 bootstrap(getView(window.location));

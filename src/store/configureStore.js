@@ -9,16 +9,17 @@ const defaultMiddlewares = __PRODUCTION__ ? [] : [loggerMiddleware];
 
 const middlewares = applyMiddleware(...defaultMiddlewares);
 
-export const enhancedStore = (callback = () => {}) => createStore => (reducer, initialState) => {
+export const enhancedStore = ({ tabId, onInit = () => {} }) => createStore => (reducer, initialState) => {
   const store = createStore(reducer, initialState, middlewares);
   store.dispatch({
     type: INIT,
     store,
-    callback
+    tabId,
+    onInit
   });
   return store;
 };
 
-export default function configureStore(initialState, callback) {
-  return enhancedStore(callback)(createStore)(reducer, initialState);
+export default function configureStore(initialState, options) {
+  return enhancedStore(options)(createStore)(reducer, initialState);
 }

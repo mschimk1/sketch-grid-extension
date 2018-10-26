@@ -16,7 +16,7 @@
 This project is fairly new, but does the following already:
 
 - [x] Switch turns the grid overlay on and off
-- [x] Configurable grid options (options are currently stored globally)
+- [x] Configurable grid options
 - [x] Synchronizes extension popup, options and content pages
 - [x] Default settings based on 8pt grid for the core structure of your page grid
 

@@ -7,6 +7,7 @@ export default class GridController {
     chrome.runtime.onInstalled.addListener(() => {
       this.resetStorage();
     });
+
     //Clear tab storage when it is closed
     chrome.tabs.onRemoved.addListener(tabId => {
       chrome.storage.local.remove(tabId.toString());

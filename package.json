@@ -1,6 +1,6 @@
 {
   "name": "sketch-grid-extension",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Chrome extension for a grid overlay with configurable settings similar to Sketch Grid",
   "scripts": {
     "start": "node scripts/start.js",

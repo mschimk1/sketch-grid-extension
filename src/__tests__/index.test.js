@@ -1,5 +1,6 @@
 /* global chrome */
-import configureStore from 'redux-mock-store';
+import { createStore } from 'redux';
+import reducer from '../store/reducers';
 import reduxStore from '../store/configureStore';
 import { LOCAL_STORAGE_KEY } from '../constants';
 import App from '../App';
@@ -16,14 +17,13 @@ jest.mock('../App', () => ({
   default: jest.fn().mockReturnValue(null)
 }));
 
-const mockCreateStore = configureStore([]);
 let store;
 
 beforeEach(() => {
   localStorage.setItem(LOCAL_STORAGE_KEY, false);
-  store = mockCreateStore({});
-  reduxStore.mockImplementationOnce((initialState, cb) => {
-    cb(store);
+  store = createStore(reducer, { [LOCAL_STORAGE_KEY]: false });
+  reduxStore.mockImplementationOnce((initialState, { onInit }) => {
+    onInit(store);
   });
 });
 
@@ -50,32 +50,40 @@ test('Does not render the content script view if the grid is not visible', () =>
   expect(App).not.toHaveBeenCalled();
 });
 
-test('Renders the content script view if the grid is visible initially', () => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
-  bootstrap();
+test('Renders the content script view if the grid is visible initially', async () => {
+  store = createStore(reducer, { [LOCAL_STORAGE_KEY]: true });
+  reduxStore.mockImplementationOnce((initialState, { onInit }) => {
+    onInit(store);
+  });
+  chrome.runtime.onMessage.addListener.mockImplementationOnce(cb => {
+    cb({ action: 'initTab', tabId: 1234 });
+  });
+  await bootstrap();
   expect(App).toHaveBeenCalled();
 });
 
-test('Renders the content script view if the grid becomes visible', () => {
-  store = mockCreateStore({ [LOCAL_STORAGE_KEY]: true });
-  reduxStore.mockImplementationOnce((initialState, cb) => {
-    cb(store);
+test('Renders the content script view if the grid becomes visible', async () => {
+  chrome.runtime.onMessage.addListener.mockImplementationOnce(cb => {
+    cb({ action: 'initTab', tabId: 1234 });
   });
-  bootstrap();
+  await bootstrap();
+  expect(App).not.toHaveBeenCalled();
   store.dispatch({
     type: UPDATE_STATE,
     payload: { [LOCAL_STORAGE_KEY]: true }
   });
-  expect(App).toHaveBeenCalled();
+  expect(App).toHaveBeenCalledTimes(1);
 });
 
-test('Removes the content script view if the grid becomes invisible', () => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
-  store = mockCreateStore({ [LOCAL_STORAGE_KEY]: false });
-  reduxStore.mockImplementationOnce((initialState, cb) => {
-    cb(store);
+test('Removes the content script view if the grid becomes invisible', async () => {
+  store = createStore(reducer, { [LOCAL_STORAGE_KEY]: true });
+  reduxStore.mockImplementationOnce((initialState, { onInit }) => {
+    onInit(store);
   });
-  bootstrap();
+  chrome.runtime.onMessage.addListener.mockImplementationOnce(cb => {
+    cb({ action: 'initTab', tabId: 1234 });
+  });
+  await bootstrap();
   store.dispatch({
     type: UPDATE_STATE,
     payload: { [LOCAL_STORAGE_KEY]: false }

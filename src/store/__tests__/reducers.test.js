@@ -2,7 +2,7 @@
 import { createStore } from 'redux';
 import { enhancedStore } from '../configureStore';
 import configureStore from 'redux-mock-store';
-import { INIT, INIT_TAB, SET_OPTIONS, UPDATE_STATE, initTab } from '../actions';
+import { INIT, SET_OPTIONS, UPDATE_STATE, initTab } from '../actions';
 import { extensionReducer, saveState, chromeStorageReducer } from '../reducers';
 import { EXTENSION_ID, LOCAL_STORAGE_KEY } from '../../constants';
 
@@ -146,12 +146,13 @@ test('saveState rejects if chrome signals runtime error', async () => {
   chrome.runtime.lastError = false;
 });
 
-test('chrome storage reducer initializes with redux store and callback function', () => {
-  const callback = jest.fn();
-  const chromeStorageStore = enhancedStore(callback)(() => mockCreateStore({}));
+test('chrome storage reducer initializes with redux store, tabId and onInit callback function', () => {
+  const tabId = '1234';
+  const onInit = jest.fn();
+  const chromeStorageStore = enhancedStore({ tabId, onInit })(() => mockCreateStore({}));
   const finalReducer = chromeStorageReducer(extensionReducer);
   const store = chromeStorageStore(finalReducer);
-  const expectedAction = { type: INIT, store, callback };
+  const expectedAction = { type: INIT, store, onInit, tabId };
   expect(store.getActions()).toEqual([expectedAction]);
 });
 
@@ -159,24 +160,27 @@ test('chrome storage reducer invokes the callback when the store is initialised'
   chrome.storage.local.get.mockImplementationOnce((key, cb) => {
     setImmediate(() => cb({ [EXTENSION_ID]: { options: { blockSize: 8 } } }));
   });
-  const callback = jest.fn();
-  const chromeStorageStore = enhancedStore(callback)(createStore);
+  const tabId = '1234';
+  const onInit = jest.fn();
+
+  const chromeStorageStore = enhancedStore({ tabId, onInit })(createStore);
   const finalReducer = chromeStorageReducer(extensionReducer);
   const store = chromeStorageStore(finalReducer);
   setImmediate(() => {
-    expect(callback).toHaveBeenCalledWith(store);
+    expect(onInit).toHaveBeenCalledWith(store);
     done();
   });
 });
 
 test('chrome storage reducer lets extension reducer handle application action', done => {
+  const tabId = '1234';
+  const onInit = jest.fn();
   chrome.storage.local.get.mockImplementationOnce((key, cb) => {
     setImmediate(() => cb({ [EXTENSION_ID]: { options: { blockSize: 8 } } }));
   });
-  const callback = jest.fn();
-  const chromeStorageStore = enhancedStore(callback)(createStore);
-  const finalReducer = chromeStorageReducer(extensionReducer);
-  const store = chromeStorageStore(finalReducer);
+  const chromeStorageStore = enhancedStore({ tabId, onInit })(createStore);
+  const reducer = chromeStorageReducer(extensionReducer);
+  const store = chromeStorageStore(reducer);
   setImmediate(() => {
     store.dispatch({
       type: SET_OPTIONS,
@@ -188,42 +192,39 @@ test('chrome storage reducer lets extension reducer handle application action', 
 });
 
 test('chrome store reducer sets new reducer state if chrome storage changes', done => {
+  const tabId = '1234';
+  const onInit = jest.fn();
+
   chrome.storage.local.get.mockImplementationOnce((key, cb) => {
-    setImmediate(() => cb({ [EXTENSION_ID]: { options: { blockSize: 8 } } }));
+    setImmediate(() => cb({ '1234': { options: { blockSize: 8 } } }));
   });
   chrome.storage.onChanged.addListener.mockImplementationOnce(cb => {
-    cb({ [EXTENSION_ID]: { newValue: { options: { blockSize: 255 } } } });
+    cb({ '1234': { newValue: { options: { blockSize: 255 } } } });
   });
-  const callback = jest.fn();
-  const chromeStorageStore = enhancedStore(callback)(createStore);
-  const finalReducer = chromeStorageReducer(extensionReducer);
-  const store = chromeStorageStore(finalReducer);
+  const chromeStorageStore = enhancedStore({ tabId, onInit })(createStore);
+  const reducer = chromeStorageReducer(extensionReducer);
+  const store = chromeStorageStore(reducer);
   setImmediate(() => {
     expect(store.getState()).toEqual({ options: { blockSize: 255 } });
     done();
   });
 });
 
-test('chrome storage reducer handles init tab action', done => {
-  chrome.storage.local.get.mockImplementationOnce((key, cb) => {
-    setImmediate(() => cb({ [EXTENSION_ID]: { options: { blockSize: 8 } } }), 0);
-  });
-  //tab storage
-  chrome.storage.local.get.mockImplementationOnce((key, cb) => {
-    setImmediate(() => cb({ '1234': { options: { blockSize: 101 } } }));
-  });
-  const callback = jest.fn();
-  const chromeStorageStore = enhancedStore(callback)(createStore);
-  const finalReducer = chromeStorageReducer(extensionReducer);
-  const store = chromeStorageStore(finalReducer);
+test('chrome store reducer ignores chrome storage changes in other tabs', done => {
+  const tabId = '1234';
+  const onInit = jest.fn();
 
-  new Promise(resolve => {
-    setImmediate(() => {
-      store.dispatch(initTab('1234'));
-      setTimeout(() => resolve(), 0);
-    });
-  }).then(() => {
-    expect(store.getState()).toEqual({ options: { blockSize: 101 } });
+  chrome.storage.local.get.mockImplementationOnce((key, cb) => {
+    setImmediate(() => cb({ '1234': { options: { blockSize: 8 } } }));
+  });
+  chrome.storage.onChanged.addListener.mockImplementationOnce(cb => {
+    cb({ '5678': { newValue: { options: { blockSize: 255 } } } });
+  });
+  const chromeStorageStore = enhancedStore({ tabId, onInit })(createStore);
+  const reducer = chromeStorageReducer(extensionReducer);
+  const store = chromeStorageStore(reducer);
+  setImmediate(() => {
+    expect(store.getState()).toEqual({ options: { blockSize: 8 } });
     done();
   });
 });
